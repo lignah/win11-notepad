@@ -1,0 +1,11 @@
+[Desktop Entry]
+Categories=Utility;TextEditor;
+Comment=Windows 11 Notepad look-alike text editor
+Exec={{exec}} %F
+Icon={{icon}}
+Name=Notepad (Win11 style)
+Name[ko]=메모장 (Win11 스타일)
+Terminal=false
+Type=Application
+MimeType=text/plain;
+StartupWMClass=win11-notepad

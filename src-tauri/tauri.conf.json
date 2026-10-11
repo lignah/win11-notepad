@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "win11-notepad",
+  "mainBinaryName": "win11-notepad",
+  "version": "1.0.0",
+  "identifier": "io.github.win11notepad.linux",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Notepad",
+        "width": 1000,
+        "height": 680,
+        "minWidth": 480,
+        "minHeight": 320,
+        "decorations": false,
+        "transparent": true,
+        "center": true,
+        "visible": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "deb",
+      "appimage"
+    ],
+    "category": "Utility",
+    "shortDescription": "Windows 11 Notepad look-alike",
+    "longDescription": "A simple tabbed text editor for Linux that recreates the look of Windows 11 Notepad. Not affiliated with Microsoft.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png"
+    ],
+    "fileAssociations": [
+      {
+        "ext": [
+          "txt",
+          "log",
+          "ini",
+          "md",
+          "csv"
+        ],
+        "mimeType": "text/plain",
+        "name": "Text Document"
+      }
+    ],
+    "linux": {
+      "deb": {
+        "desktopTemplate": "notepad.desktop",
+        "section": "editors"
+      },
+      "appimage": {}
+    }
+  }
+}

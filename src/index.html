@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notepad</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app" class="window">
+  <!-- resize handles for the undecorated window -->
+  <div class="rz n" data-dir="North"></div><div class="rz s" data-dir="South"></div>
+  <div class="rz e" data-dir="East"></div><div class="rz w" data-dir="West"></div>
+  <div class="rz ne" data-dir="NorthEast"></div><div class="rz nw" data-dir="NorthWest"></div>
+  <div class="rz se" data-dir="SouthEast"></div><div class="rz sw" data-dir="SouthWest"></div>
+
+  <header class="titlebar" data-tauri-drag-region>
+    <div class="app-icon" id="appIcon" data-tauri-drag-region></div>
+    <div class="tabstrip" data-tauri-drag-region>
+      <div id="tabs" class="tabs" role="tablist"></div>
+      <button id="newTabBtn" class="tab-add" title="Add New Tab (Ctrl+N)"></button>
+      <div class="drag-fill" data-tauri-drag-region></div>
+    </div>
+    <div class="caption-buttons">
+      <button id="btnMin" class="caption" title="Minimize"></button>
+      <button id="btnMax" class="caption" title="Maximize"></button>
+      <button id="btnClose" class="caption close" title="Close"></button>
+    </div>
+  </header>
+
+  <main id="mainView" class="layer">
+    <nav class="menubar">
+      <div class="menus">
+        <button class="menu-btn" data-menu="file">File</button>
+        <button class="menu-btn" data-menu="edit">Edit</button>
+        <button class="menu-btn" data-menu="view">View</button>
+      </div>
+      <button id="settingsBtn" class="icon-btn" title="Settings"></button>
+    </nav>
+    <section class="editor-wrap" id="editorWrap">
+      <div id="editors"></div>
+      <div id="findOverlay" class="find-overlay" aria-hidden="true"></div>
+      <div id="findBar" class="findbar hidden">
+        <div class="find-row">
+          <button id="findToggle" class="icon-btn sm" title="Toggle find and replace"></button>
+          <div class="textbox grow"><input id="findInput" placeholder="Find" spellcheck="false" autocomplete="off" /><span id="findCount" class="find-count"></span></div>
+          <button id="findPrev" class="icon-btn sm" title="Find previous (Shift+F3)"></button>
+          <button id="findNext" class="icon-btn sm" title="Find next (F3)"></button>
+          <button id="findOpts" class="icon-btn sm" title="Options"></button>
+          <button id="findClose" class="icon-btn sm" title="Close (Esc)"></button>
+        </div>
+        <div class="replace-row">
+          <div class="spacer-32"></div>
+          <div class="textbox grow"><input id="replaceInput" placeholder="Replace" spellcheck="false" autocomplete="off" /></div>
+          <button id="replaceOne" class="btn sm">Replace</button>
+          <button id="replaceAll" class="btn sm">Replace all</button>
+        </div>
+      </div>
+    </section>
+    <footer class="statusbar" id="statusbar">
+      <span class="st" id="stPos">Ln 1, Col 1</span>
+      <span class="st" id="stChars">0 characters</span>
+      <span class="st-fill"></span>
+      <span class="st" id="zoomLabel">100%</span>
+      <span class="st click" id="stEol" title="Line ending">Windows (CRLF)</span>
+      <span class="st click" id="stEnc" title="Encoding">UTF-8</span>
+    </footer>
+  </main>
+
+  <main id="settingsView" class="settings hidden">
+    <div class="settings-scroll">
+      <div class="settings-inner">
+        <div class="settings-header">
+          <button id="settingsBack" class="icon-btn" title="Back"></button>
+          <h1>Settings</h1>
+        </div>
+
+        <h3 class="group-title">Appearance</h3>
+        <div class="card expander" id="themeCard">
+          <div class="card-head">
+            <span class="card-icon" data-icon="brush"></span>
+            <div class="card-text"><div class="card-title">App theme</div><div class="card-desc">Select which app theme to display</div></div>
+            <span class="card-value" id="themeValue"></span>
+            <span class="chev" data-icon="chevDown"></span>
+          </div>
+          <div class="card-body">
+            <label class="radio"><input type="radio" name="theme" value="light" /><span class="rdot"></span>Light</label>
+            <label class="radio"><input type="radio" name="theme" value="dark" /><span class="rdot"></span>Dark</label>
+            <label class="radio"><input type="radio" name="theme" value="system" /><span class="rdot"></span>Use system setting</label>
+          </div>
+        </div>
+
+        <h3 class="group-title">Text formatting</h3>
+        <div class="card expander" id="fontCard">
+          <div class="card-head">
+            <span class="card-icon" data-icon="font"></span>
+            <div class="card-text"><div class="card-title">Font</div><div class="card-desc" id="fontDesc"></div></div>
+            <span class="chev" data-icon="chevDown"></span>
+          </div>
+          <div class="card-body">
+            <div class="setting-row"><span>Family</span><button class="combo" id="fontFamily"></button></div>
+            <div class="setting-row"><span>Style</span><button class="combo" id="fontStyle"></button></div>
+            <div class="setting-row"><span>Size</span><button class="combo" id="fontSize"></button></div>
+            <div class="font-preview" id="fontPreview">The quick brown fox jumps over the lazy dog. 0123456789</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head static">
+            <span class="card-icon" data-icon="wrap"></span>
+            <div class="card-text"><div class="card-title">Word wrap</div><div class="card-desc">Fit text within the window by default</div></div>
+            <label class="toggle"><span class="toggle-label" id="wrapLabel">On</span><input type="checkbox" id="wrapToggle" /><span class="track"><span class="knob"></span></span></label>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head static">
+            <span class="card-icon" data-icon="status"></span>
+            <div class="card-text"><div class="card-title">Status bar</div><div class="card-desc">Show line, column, zoom, line ending and encoding</div></div>
+            <label class="toggle"><span class="toggle-label" id="statusLabel">On</span><input type="checkbox" id="statusToggle" /><span class="track"><span class="knob"></span></span></label>
+          </div>
+        </div>
+
+        <h3 class="group-title">About this app</h3>
+        <div class="card expander open" id="aboutCard">
+          <div class="card-head">
+            <span class="card-icon app-mini" id="aboutIcon"></span>
+            <div class="card-text"><div class="card-title">Notepad for Linux</div><div class="card-desc">Version 1.0.0</div></div>
+            <span class="chev" data-icon="chevDown"></span>
+          </div>
+          <div class="card-body about">
+            <p>An independent, open re-creation of the Windows&nbsp;11 Notepad look and feel, built with Tauri.</p>
+            <p>Not affiliated with or endorsed by Microsoft. All icons are original drawings.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="dialogLayer" class="dialog-layer hidden"></div>
+</div>
+<div id="menuLayer"></div>
+<script src="icons.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
